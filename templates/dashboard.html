@@ -1,56 +1,156 @@
-{% extends "base.html" %}
-{% block content %}
-<div class="mb-12">
-    <h2 class="text-4xl font-extrabold tracking-tight">Dashboard</h2>
-    <p class="text-gray-400 text-lg mt-2 font-medium">Real-time threat intelligence overview.</p>
-</div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PhishGuard | Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0a0a0a;
+            --card-bg: #141414;
+            --accent-blue: #3b82f6;
+            --accent-red: #ef4444;
+            --accent-green: #10b981;
+            --text-main: #ffffff;
+            --text-dim: #a1a1aa;
+        }
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            display: flex;
+        }
+        /* Sidebar */
+        .sidebar {
+            width: 240px;
+            height: 100vh;
+            background: #000;
+            border-right: 1px solid #222;
+            padding: 20px;
+            position: fixed;
+        }
+        .logo { font-weight: 600; color: var(--accent-blue); margin-bottom: 40px; font-size: 1.2rem; }
+        .nav-links { list-style: none; padding: 0; }
+        .nav-links li { margin: 20px 0; }
+        .nav-links a { color: var(--text-dim); text-decoration: none; font-size: 0.9rem; transition: 0.3s; }
+        .nav-links a:hover { color: var(--text-main); }
 
-<div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
-    <div class="card p-8 shadow-xl">
-        <p class="text-xs text-gray-500 uppercase font-bold tracking-widest mb-2">Total Scans</p>
-        <p class="text-4xl font-black text-white">1</p>
-    </div>
-    <div class="card p-8 border-red-900/40">
-        <p class="text-xs text-red-500 uppercase font-bold tracking-widest mb-2">Phishing Detected</p>
-        <p class="text-4xl font-black text-red-500">1</p>
-    </div>
-    <div class="card p-8 border-green-900/40 text-center">
-        <p class="text-xs text-green-500 uppercase font-bold tracking-widest mb-2">System Status</p>
-        <p class="text-3xl font-black text-green-400 uppercase">Online</p>
-    </div>
-    <div class="card p-8 border-blue-900/40 text-center">
-        <p class="text-xs text-blue-500 uppercase font-bold tracking-widest mb-2">Threat Score</p>
-        <p class="text-4xl font-black text-blue-400">85</p>
-    </div>
-</div>
+        /* Main Content */
+        .main-content {
+            margin-left: 240px;
+            padding: 40px;
+            width: 100%;
+        }
+        h1 { font-size: 2rem; margin-bottom: 5px; }
+        .subtitle { color: var(--text-dim); margin-bottom: 40px; }
 
-<div class="card overflow-hidden">
-    <div class="p-8 border-b border-gray-800 flex justify-between items-center bg-white/5">
-        <h3 class="text-lg font-bold text-gray-200 uppercase tracking-widest">Recent Intelligence</h3>
-        <a href="/history" class="text-xs text-blue-500 font-bold uppercase border-b border-blue-500/30">View Analysis History →</a>
-    </div>
-    <div class="p-8">
-        <div class="flex items-center justify-between p-6 bg-black/60 border border-gray-800 rounded-xl hover:border-gray-600 transition group">
-            <div class="flex items-center space-x-6">
-                <div class="w-12 h-12 rounded-lg bg-red-900/20 flex items-center justify-center border border-red-900/40">
-                    <span class="text-red-500 text-xl font-bold">!</span>
-                </div>
-                <div>
-                    <p class="text-lg font-bold text-white group-hover:text-blue-400 transition">Urgent: Your PayPal Account Will Be Limited</p>
-                    <p class="text-sm text-gray-500 mt-1">PayPal Support • Just Now</p>
-                </div>
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        .stat-card {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 12px;
+            border: 1px solid #222;
+            text-align: center;
+        }
+        .stat-label { font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; }
+        .stat-value { font-size: 2rem; font-weight: 600; margin-top: 10px; }
+        .stat-value.red { color: var(--accent-red); }
+        .stat-value.green { color: var(--accent-green); }
+
+        /* Recent Activity Table */
+        .activity-section {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 25px;
+            border: 1px solid #222;
+        }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th { text-align: left; color: var(--text-dim); font-size: 0.8rem; padding-bottom: 15px; border-bottom: 1px solid #222; }
+        td { padding: 15px 0; border-bottom: 1px solid #1a1a1a; font-size: 0.9rem; }
+        .btn-analyze {
+            background: var(--accent-blue);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 6px;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 20px;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="sidebar">
+        <div class="logo">PhishGuard <br><span style="font-size: 0.7rem; color: #555;">FORENSICS LAB</span></div>
+        <ul class="nav-links">
+            <li><a href="/">Dashboard</a></li>
+            <li><a href="/analyze">Analyze Email</a></li>
+            <li><a href="/history">History</a></li>
+        </ul>
+    </nav>
+
+    <main class="main-content">
+        <h1>Dashboard</h1>
+        <p class="subtitle">Real-time threat intelligence overview.</p>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Total Scans</div>
+                <div class="stat-value">{{ total }}</div>
             </div>
-            <div class="text-right">
-                <p class="text-red-500 font-black text-2xl">85/100</p>
-                <p class="text-[10px] text-red-700 font-bold uppercase tracking-widest">Critical Alert</p>
+            <div class="stat-card">
+                <div class="stat-label">Phishing Detected</div>
+                <div class="stat-value red">{{ phishing }}</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">System Status</div>
+                <div class="stat-value green">ONLINE</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Latest Threat Score</div>
+                <div class="stat-value">{{ latest }}/100</div>
             </div>
         </div>
-    </div>
-</div>
 
-<div class="mt-16 flex justify-center">
-    <a href="/analyze" class="bg-blue-600 hover:bg-blue-700 text-white px-16 py-5 rounded-xl font-black text-sm uppercase tracking-widest transition shadow-2xl shadow-blue-900/20 active:scale-95">
-        Analyze Suspicious Email +
-    </a>
-</div>
-{% endblock %}
+        <section class="activity-section">
+            <h3>Recent Intelligence</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>SUBJECT</th>
+                        <th>SENDER</th>
+                        <th>THREAT SCORE</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in history %}
+                    <tr>
+                        <td>{{ item.subject }}</td>
+                        <td>{{ item.sender }}</td>
+                        <td style="color: {% if item.score > 50 %}#ef4444{% else %}#10b981{% endif %}">
+                            {{ item.score }}/100
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="3" style="text-align: center; color: var(--text-dim);">No recent activity. Start by analyzing an email.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <a href="/analyze" class="btn-analyze">ANALYZE SUSPICIOUS EMAIL +</a>
+        </section>
+    </main>
+
+</body>
+</html>

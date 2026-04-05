@@ -1,41 +1,53 @@
-{% extends "base.html" %}
-{% block content %}
-<div class="mb-10">
-    <h2 class="text-3xl font-bold text-white">Analysis History</h2>
-    <p class="text-gray-500 text-sm">Review past forensic reports and threat detections.</p>
-</div>
-
-<div class="card overflow-hidden bg-[#0c0c0c] border border-gray-800 rounded-xl">
-    <table class="w-full text-left border-collapse">
-        <thead>
-            <tr class="border-b border-gray-800 bg-white/5">
-                <th class="p-6 text-[11px] font-bold text-gray-400 uppercase tracking-widest">Date</th>
-                <th class="p-6 text-[11px] font-bold text-gray-400 uppercase tracking-widest">Subject</th>
-                <th class="p-6 text-[11px] font-bold text-gray-400 uppercase tracking-widest text-center">Threat Score</th>
-                <th class="p-6 text-[11px] font-bold text-gray-400 uppercase tracking-widest text-right">Action</th>
-            </tr>
-        </thead>
-        <tbody class="divide-y divide-gray-900">
-            {% for item in history %}
-            <tr class="hover:bg-white/[0.02] transition">
-                <td class="p-6 text-sm text-gray-500 font-mono">{{ item.timestamp }}</td>
-                <td class="p-6">
-                    <p class="text-sm font-bold text-gray-200">{{ item.subject }}</p>
-                    <p class="text-[10px] text-gray-600 mt-1">{{ item.sender }}</p>
-                </td>
-                <td class="p-6 text-center">
-                    <span class="text-red-500 font-black">{{ item.score }}/100</span>
-                </td>
-                <td class="p-6 text-right">
-                    <button class="text-blue-500 text-xs font-bold uppercase hover:underline">View Report</button>
-                </td>
-            </tr>
-            {% else %}
-            <tr>
-                <td colspan="4" class="p-20 text-center text-gray-600 italic">No analysis history found.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
-{% endblock %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PhishGuard | History</title>
+    <style>
+        body { background: #0a0a0a; color: white; font-family: 'Inter', sans-serif; padding: 40px; }
+        .history-card { background: #141414; border: 1px solid #222; border-radius: 12px; padding: 25px; }
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; color: #555; padding-bottom: 15px; border-bottom: 1px solid #222; font-size: 0.8rem; }
+        td { padding: 20px 0; border-bottom: 1px solid #1a1a1a; font-size: 0.9rem; }
+        .threat-red { color: #ef4444; font-weight: bold; }
+        .threat-green { color: #10b981; font-weight: bold; }
+        .view-btn { color: #3b82f6; text-decoration: none; font-weight: bold; border: 1px solid #3b82f6; padding: 5px 10px; border-radius: 4px; font-size: 0.75rem; transition: 0.3s; }
+        .view-btn:hover { background: #3b82f6; color: white; }
+    </style>
+</head>
+<body>
+    <h1>Analysis History</h1>
+    <div class="history-card">
+        <table>
+            <thead>
+                <tr>
+                    <th>DATE</th>
+                    <th>SUBJECT</th>
+                    <th>THREAT SCORE</th>
+                    <th>ACTION</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for index, item in history %}
+                <tr>
+                    <td style="color: #555;">{{ item.timestamp }}</td>
+                    <td>
+                        <strong>{{ item.subject }}</strong><br>
+                        <span style="font-size: 0.7rem; color: #444;">{{ item.sender }}</span>
+                    </td>
+                    <td class="{% if item.score > 50 %}threat-red{% else %}threat-green{% endif %}">
+                        {{ item.score }}/100
+                    </td>
+                    <td>
+                        <a href="/report/{{ index }}" class="view-btn">VIEW REPORT</a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="4" style="text-align: center; color: #555;">No records found.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <br><a href="/" style="color: #555; text-decoration: none;">← Back to Dashboard</a>
+</body>
+</html>
