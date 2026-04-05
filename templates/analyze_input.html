@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="mb-12 text-center max-w-2xl mx-auto">
+    <h2 class="text-4xl font-extrabold tracking-tight text-white">Analyze Email</h2>
+    <p class="text-gray-400 text-lg mt-3">Paste a suspicious email for AI-powered forensic analysis and attribution.</p>
+</div>
+
+<div class="max-w-4xl mx-auto input-group shadow-2xl p-10 bg-[#0c0c0c] border border-gray-800 rounded-xl">
+    <div class="flex items-center justify-between mb-8 border-b border-gray-800 pb-5">
+        <div class="flex items-center space-x-3 text-blue-400">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+            <h3 class="font-bold text-gray-200 text-lg">Email Content</h3>
+        </div>
+        <button class="bg-gray-800 hover:bg-gray-700 text-xs text-gray-300 px-4 py-2 rounded font-medium flex items-center transition">
+            Paste Raw Email
+        </button>
+    </div>
+
+    <form action="/analyze" method="POST" class="space-y-8">
+        <div>
+            <label class="cyber-label text-gray-400 font-bold mb-2 block uppercase tracking-widest text-[11px]">👤 Sender Email</label>
+            <input 
+                type="email" 
+                name="sender_email" 
+                class="w-full bg-black border border-gray-800 text-white p-4 rounded-lg focus:border-blue-500 focus:outline-none transition"
+                placeholder="e.g. security@bank-alert.com"
+                required>
+        </div>
+
+        <div>
+            <label class="cyber-label text-gray-400 font-bold mb-2 block uppercase tracking-widest text-[11px]">✉ Subject Line</label>
+            <input 
+                type="text" 
+                name="subject_line" 
+                class="w-full bg-black border border-gray-800 text-white p-4 rounded-lg focus:border-blue-500 focus:outline-none transition"
+                placeholder="e.g. Urgent: Your account has been compromised"
+                required>
+        </div>
+
+        <div>
+            <label class="cyber-label text-gray-400 font-bold mb-2 block uppercase tracking-widest text-[11px]">📄 Email Body</label>
+            <textarea 
+                name="email_body" 
+                rows="12" 
+                class="w-full bg-black border border-gray-800 text-white p-4 rounded-lg focus:border-blue-500 focus:outline-none font-mono transition"
+                placeholder="Paste the full email body content here..."
+                required></textarea>
+        </div>
+        
+        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-5 rounded-xl shadow-lg transition-all transform active:scale-95 uppercase tracking-widest">
+            Run Forensic Analysis
+        </button>
+    </form>
+</div>
+
+<div class="mt-10 max-w-4xl mx-auto card p-8 rounded-xl border-gray-900 bg-black/40">
+    <p class="font-bold text-gray-300 uppercase tracking-widest text-xs mb-4">Tips for best results</p>
+    <ul class="space-y-3 text-sm text-gray-500 pl-5 list-disc leading-relaxed">
+        <li>Include the complete email body, including any links and signatures.</li>
+        <li>Provide the exact sender email address for domain analysis.</li>
+        <li>Use "Paste Raw Email" to auto-extract headers from raw email source.</li>
+    </ul>
+</div>
+{% endblock %}
